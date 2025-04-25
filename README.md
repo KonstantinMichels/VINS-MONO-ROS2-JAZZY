@@ -1,5 +1,8 @@
+> **IMPORTANT INFORMATION:**
+> NOT UP TO DATE
+
 # VINS-MONO-ROS2
-## ROS2 version of VINS-MONO
+## ROS2 Jazzy version of VINS-MONO
 # 1. Introduction
 This repository implements the ROS2 version of VINS-MONO, mainly including the following packages:
 * **camera_model**
