@@ -677,14 +677,14 @@ void Estimator::optimization()
     loss_function = new ceres::CauchyLoss(1.0);
     for (int i = 0; i < WINDOW_SIZE + 1; i++)
     {
-        ceres::LocalParameterization *local_parameterization = new PoseLocalParameterization();
-        problem.AddParameterBlock(para_Pose[i], SIZE_POSE, local_parameterization);
+        std::unique_ptr<ceres::Manifold> manifold = std::make_unique<PoseLocalParameterizationManifold>();
+        problem.AddParameterBlock(para_Pose[i], SIZE_POSE, manifold.release());
         problem.AddParameterBlock(para_SpeedBias[i], SIZE_SPEEDBIAS);
     }
     for (int i = 0; i < NUM_OF_CAM; i++)
     {
-        ceres::LocalParameterization *local_parameterization = new PoseLocalParameterization();
-        problem.AddParameterBlock(para_Ex_Pose[i], SIZE_POSE, local_parameterization);
+        std::unique_ptr<ceres::Manifold> manifold = std::make_unique<PoseLocalParameterizationManifold>();
+        problem.AddParameterBlock(para_Ex_Pose[i], SIZE_POSE, manifold.release());
         if (!ESTIMATE_EXTRINSIC)
         {
             RCUTILS_LOG_DEBUG("fix extinsic param");
@@ -771,8 +771,8 @@ void Estimator::optimization()
     if(relocalization_info)
     {
         //printf("set relocalization factor! \n");
-        ceres::LocalParameterization *local_parameterization = new PoseLocalParameterization();
-        problem.AddParameterBlock(relo_Pose, SIZE_POSE, local_parameterization);
+        std::unique_ptr<ceres::Manifold> manifold = std::make_unique<PoseLocalParameterizationManifold>();
+        problem.AddParameterBlock(relo_Pose, SIZE_POSE, manifold.release());
         int retrive_feature_index = 0;
         int feature_index = -1;
         for (auto &it_per_id : f_manager.feature)

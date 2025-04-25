@@ -15,10 +15,11 @@ find_package(geometry_msgs REQUIRED)
 find_package(cv_bridge REQUIRED)
 find_package(camera_model REQUIRED)
 find_package(image_transport REQUIRED)
-
 find_package(OpenCV 4 REQUIRED)
 
 include_directories("../camera_model/include")
+include_directories(${cv_bridge_INCLUDE_DIRS})
+
 
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 find_package(Eigen3)
@@ -34,6 +35,8 @@ add_executable(feature_tracker
 
 ament_target_dependencies(feature_tracker rclcpp rcpputils std_msgs sensor_msgs geometry_msgs cv_bridge camera_model image_transport)
 target_link_libraries(feature_tracker ${OpenCV_LIBS})
+
+target_link_libraries(feature_tracker ${cv_bridge_LIBRARIES})
 
 # Install nodes
 install(

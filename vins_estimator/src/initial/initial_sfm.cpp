@@ -230,8 +230,8 @@ bool GlobalSFM::construct(int frame_num, Quaterniond* q, Vector3d* T, int l,
 	}
 */
 	//full BA
-	ceres::Problem problem;
-	ceres::LocalParameterization* local_parameterization = new ceres::QuaternionParameterization();
+	ceres::Problem problem;	
+	ceres::Manifold* local_parameterization_manifold = new ceres::EigenQuaternionManifold();
 	//cout << " begin full BA " << endl;
 	for (int i = 0; i < frame_num; i++)
 	{
@@ -243,7 +243,7 @@ bool GlobalSFM::construct(int frame_num, Quaterniond* q, Vector3d* T, int l,
 		c_rotation[i][1] = c_Quat[i].x();
 		c_rotation[i][2] = c_Quat[i].y();
 		c_rotation[i][3] = c_Quat[i].z();
-		problem.AddParameterBlock(c_rotation[i], 4, local_parameterization);
+		problem.AddParameterBlock(c_rotation[i], 4, local_parameterization_manifold);
 		problem.AddParameterBlock(c_translation[i], 3);
 		if (i == l)
 		{

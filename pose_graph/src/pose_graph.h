@@ -96,22 +96,34 @@ T NormalizeAngle(const T& angle_degrees) {
   	return angle_degrees;
 };
 
-class AngleLocalParameterization {
- public:
+class AngleManifold : public ceres::Manifold {
+public:
+    int AmbientSize() const override { return 1; }  // Größe des ursprünglichen Parameterraums
+    int TangentSize() const override { return 1; }  // Tangentenraumdimensionalität
 
-  template <typename T>
-  bool operator()(const T* theta_radians, const T* delta_theta_radians,
-                  T* theta_radians_plus_delta) const {
-    *theta_radians_plus_delta =
-        NormalizeAngle(*theta_radians + *delta_theta_radians);
+    // Plus-Operation
+    bool Plus(const double* x, const double* delta, double* x_plus_delta) const override {
+        x_plus_delta[0] = x[0] + delta[0];  // Beispiel: einfache Addition
+        return true;
+    }
 
-    return true;
-  }
+    // Jacobian der Plus-Operation
+    bool PlusJacobian(const double* x, double* jacobian) const override {
+        jacobian[0] = 1.0;  // Identitätsmatrix, da einfache Addition
+        return true;
+    }
 
-  static ceres::LocalParameterization* Create() {
-    return (new ceres::AutoDiffLocalParameterization<AngleLocalParameterization,
-                                                     1, 1>);
-  }
+    // Minus-Operation (optional)
+    bool Minus(const double* y, const double* x, double* y_minus_x) const override {
+        y_minus_x[0] = y[0] - x[0];
+        return true;
+    }
+
+    // Jacobian der Minus-Operation (optional)
+    bool MinusJacobian(const double* x, double* jacobian) const override {
+        jacobian[0] = 1.0;  // Identitätsmatrix
+        return true;
+    }
 };
 
 template <typename T> 

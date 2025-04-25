@@ -15,6 +15,9 @@ find_package(OpenCV 4 REQUIRED)
 find_package(Ceres REQUIRED)
 include_directories(${CERES_INCLUDE_DIRS})
 
+find_package(cv_bridge REQUIRED)
+include_directories(${cv_bridge_INCLUDE_DIRS})
+
 ament_export_include_directories(include)
 ament_export_libraries(camera_model)
 ament_export_dependencies(std_msgs)
@@ -52,6 +55,8 @@ add_library(camera_model
 
 target_link_libraries(Calibration ${Boost_LIBRARIES} ${OpenCV_LIBS} ${CERES_LIBRARIES})
 target_link_libraries(camera_model ${Boost_LIBRARIES} ${OpenCV_LIBS} ${CERES_LIBRARIES})
+
+target_link_libraries(${PROJECT_NAME} ${cv_bridge_LIBRARIES})
 
 # Install
 install(TARGETS

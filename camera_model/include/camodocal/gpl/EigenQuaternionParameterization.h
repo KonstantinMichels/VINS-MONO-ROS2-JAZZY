@@ -1,40 +1,30 @@
 #ifndef EIGENQUATERNIONPARAMETERIZATION_H
 #define EIGENQUATERNIONPARAMETERIZATION_H
 
-#include "ceres/local_parameterization.h"
+#include "ceres/manifold.h"
+#include <Eigen/Core>
+#include <Eigen/Geometry>
 
-namespace camodocal
-{
+namespace camodocal {
 
-class EigenQuaternionParameterization : public ceres::LocalParameterization
-{
+class EigenQuaternionParameterization : public ceres::Manifold {
 public:
     virtual ~EigenQuaternionParameterization() {}
-    virtual bool Plus(const double* x,
-                      const double* delta,
-                      double* x_plus_delta) const;
-    virtual bool ComputeJacobian(const double* x,
-                                 double* jacobian) const;
-    virtual int GlobalSize() const { return 4; }
-    virtual int LocalSize() const { return 3; }
+
+    // Overridden methods from ceres::Manifold
+    int AmbientSize() const override { return 4; }  // Quaternion hat 4 Komponenten
+    int TangentSize() const override { return 3; }  // 3 Freiheitsgrade für Rotation
+
+    virtual bool Plus(const double* x, const double* delta, double* x_plus_delta) const override;
+    virtual bool Minus(const double* y, const double* x, double* y_minus_x) const override;
+    virtual bool MinusJacobian(const double* x, double* jacobian) const override;
+    virtual bool PlusJacobian(const double* x, double* jacobian) const override;
 
 private:
-    template<typename T>
-    void EigenQuaternionProduct(const T z[4], const T w[4], T zw[4]) const;
+    void EigenQuaternionProduct(const double z[4], const double w[4], double zw[4]) const;
 };
 
 
-template<typename T>
-void
-EigenQuaternionParameterization::EigenQuaternionProduct(const T z[4], const T w[4], T zw[4]) const
-{
-    zw[0] = z[3] * w[0] + z[0] * w[3] + z[1] * w[2] - z[2] * w[1];
-    zw[1] = z[3] * w[1] - z[0] * w[2] + z[1] * w[3] + z[2] * w[0];
-    zw[2] = z[3] * w[2] + z[0] * w[1] - z[1] * w[0] + z[2] * w[3];
-    zw[3] = z[3] * w[3] - z[0] * w[0] - z[1] * w[1] - z[2] * w[2];
-}
-
-}
+}  // namespace camodocal
 
 #endif
-
